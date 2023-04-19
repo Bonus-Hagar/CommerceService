@@ -26,6 +26,7 @@ using LSRetail.Omni.Domain.DataModel.ScanPayGo.Checkout;
 using LSRetail.Omni.Domain.DataModel.Loyalty.Replication;
 using Newtonsoft.Json;
 using RestSharp;
+using LSRetail.Omni.Domain.DataModel.Loyalty.PassCreator;
 
 namespace LSOmni.Service
 {
@@ -2272,7 +2273,10 @@ namespace LSOmni.Service
 
             string authorizationKey = config.SettingsGetByKey(ConfigKey.PassCreator_AuthorizationKey);
             string templateId = config.SettingsGetByKey(ConfigKey.PassCreator_TemplateUid);
-            
+
+            var passId = $"SPG:{cardId}";
+
+
             try
             {
                 logger.Debug(config.LSKey.Key, $"CreateWalletPass cardId:{cardId}");
@@ -2284,7 +2288,7 @@ namespace LSOmni.Service
                 if (contact != null)
                 {
                     //get existing pass
-                    var retrievePassClient = new RestClient($"https://app.passcreator.com/api/pass/{cardId}");
+                    var retrievePassClient = new RestClient($"https://app.passcreator.com/api/pass/{passId}");
 
                     var retrievePassRequest = new RestRequest(string.Empty, Method.GET);
                     retrievePassRequest.AddOrUpdateHeader("Authorization", authorizationKey);
@@ -2305,7 +2309,16 @@ namespace LSOmni.Service
                     request.AddOrUpdateHeader("Authorization", authorizationKey);
                     request.AddOrUpdateHeader("Content-Type", "application/json");
                     request.RequestFormat = DataFormat.Json;
-                    request.AddBody(new { userProvidedId = cardId, barcodeValue = cardId });
+
+                    var passCreatorBody = new PassCreatorBody()
+                    {
+                        Id = passId,
+                        Barcode = cardId,
+                        CustomerName = contact.Name,
+                        CustomerNumber = cardId
+                    };
+
+                    request.AddBody(JsonConvert.SerializeObject(passCreatorBody));
 
                     var createPassResponse = createPassClient.Post(request); 
                     
