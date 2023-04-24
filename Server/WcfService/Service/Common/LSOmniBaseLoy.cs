@@ -2271,19 +2271,19 @@ namespace LSOmni.Service
         {
             Statistics stat = logger.StatisticStartMain(config, serverUri);
 
-            logger.Debug(config.LSKey.Key, $"CreateWalletPass cardId:{cardId}");
+            logger.Error(config.LSKey.Key, $"CreateWalletPass cardId:{cardId}");
 
             string authorizationKey = config.SettingsGetByKey(ConfigKey.PassCreator_AuthorizationKey);
             string templateId = config.SettingsGetByKey(ConfigKey.PassCreator_TemplateUid);
 
             if (string.IsNullOrEmpty(authorizationKey))
             {
-                logger.Debug(config.LSKey.Key, $"Auth key is empty");
+                logger.Error(config.LSKey.Key, $"Auth key is empty");
             }
 
             if (string.IsNullOrEmpty(templateId))
             {
-                logger.Debug(config.LSKey.Key, $"Template Id is empty");
+                logger.Error(config.LSKey.Key, $"Template Id is empty");
             }
 
             var passId = $"SPG:{cardId}";
