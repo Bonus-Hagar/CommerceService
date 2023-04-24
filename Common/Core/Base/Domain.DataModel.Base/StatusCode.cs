@@ -546,6 +546,12 @@ namespace LSRetail.Omni.Domain.DataModel.Base
         SettingsConfigSave = 11002,
 
         #endregion
+
+        [EnumMember]
+        PassCreator_MissingTemplateId = 20001,
+
+        [EnumMember]
+        PassCreator_MissingAuthKey = 20002,
     }
 }
  

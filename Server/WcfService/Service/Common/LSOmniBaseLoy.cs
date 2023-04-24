@@ -2273,23 +2273,25 @@ namespace LSOmni.Service
 
             logger.Debug(config.LSKey.Key, $"CreateWalletPass cardId:{cardId}");
 
-            string authorizationKey = config.SettingsGetByKey(ConfigKey.PassCreator_AuthorizationKey);
-            string templateId = config.SettingsGetByKey(ConfigKey.PassCreator_TemplateUid);
-
-            if (string.IsNullOrEmpty(authorizationKey))
-            {
-                logger.Debug(config.LSKey.Key, $"Auth key is empty");
-            }
-
-            if (string.IsNullOrEmpty(templateId))
-            {
-                logger.Debug(config.LSKey.Key, $"Template Id is empty");
-            }
-
-            var passId = $"SPG:{cardId}";
-
             try
             {
+                string authorizationKey = config.SettingsGetByKey(ConfigKey.PassCreator_AuthorizationKey);
+                string templateId = config.SettingsGetByKey(ConfigKey.PassCreator_TemplateUid);
+
+                if (string.IsNullOrEmpty(authorizationKey))
+                {
+                    logger.Error(config.LSKey.Key, $"Auth key is empty");
+                    throw new LSOmniException(StatusCode.PassCreator_MissingAuthKey);
+                }
+
+                if (string.IsNullOrEmpty(templateId))
+                {
+                    logger.Error(config.LSKey.Key, $"Template Id is empty");
+                    throw new LSOmniException(StatusCode.PassCreator_MissingTemplateId);
+                }
+
+                var passId = $"SPG:{cardId}";
+
                 logger.Debug(config.LSKey.Key, $"CreateWalletPass cardId:{passId}");
 
                 string passUrl = string.Empty;
