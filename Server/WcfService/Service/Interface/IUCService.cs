@@ -3214,6 +3214,18 @@ namespace LSOmni.Service
 
         #endregion
 
+        #region PassCreator
+
+        /// <summary>
+        /// Create Wallet pass if it doesnt exist and return url to all to wallet
+        /// </summary>
+        /// <param name="cardId"></param>
+        /// <returns></returns>
+        [OperationContract]
+        string CreateWalletPass(string cardId);
+
+        #endregion
+
         [OperationContract]
         string MyCustomFunction(string data);
     }

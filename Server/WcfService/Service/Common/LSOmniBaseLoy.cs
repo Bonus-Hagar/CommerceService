@@ -25,8 +25,8 @@ using LSRetail.Omni.Domain.DataModel.ScanPayGo.Setup;
 using LSRetail.Omni.Domain.DataModel.ScanPayGo.Checkout;
 using LSRetail.Omni.Domain.DataModel.Loyalty.Replication;
 using Newtonsoft.Json;
-using RestSharp;
 using LSRetail.Omni.Domain.DataModel.Loyalty.PassCreator;
+using System.Net.Http;
 
 namespace LSOmni.Service
 {
@@ -2273,50 +2273,106 @@ namespace LSOmni.Service
 
             logger.Debug(config.LSKey.Key, $"CreateWalletPass cardId:{cardId}");
 
+            string authorizationKey = config.SettingsGetByKey(ConfigKey.PassCreator_AuthorizationKey);
+            string templateId = config.SettingsGetByKey(ConfigKey.PassCreator_TemplateUid);
+
+            if (string.IsNullOrEmpty(authorizationKey))
+            {
+                logger.Error(config.LSKey.Key, $"Auth key is empty");
+                throw new LSOmniException(StatusCode.PassCreator_MissingAuthKey);
+            }
+
+            if (string.IsNullOrEmpty(templateId))
+            {
+                logger.Error(config.LSKey.Key, $"Template Id is empty");
+                throw new LSOmniException(StatusCode.PassCreator_MissingTemplateId);
+            }
+
+            var passId = $"SPG:{cardId}";
+
+            logger.Debug(config.LSKey.Key, $"CreateWalletPass cardId:{passId}");
+
+            string passUrl = string.Empty;
+            var contact = ContactGetByCardId(cardId, 0);
+
             try
             {
-                string authorizationKey = config.SettingsGetByKey(ConfigKey.PassCreator_AuthorizationKey);
-                string templateId = config.SettingsGetByKey(ConfigKey.PassCreator_TemplateUid);
-
-                if (string.IsNullOrEmpty(authorizationKey))
-                {
-                    logger.Error(config.LSKey.Key, $"Auth key is empty");
-                    throw new LSOmniException(StatusCode.PassCreator_MissingAuthKey);
-                }
-
-                if (string.IsNullOrEmpty(templateId))
-                {
-                    logger.Error(config.LSKey.Key, $"Template Id is empty");
-                    throw new LSOmniException(StatusCode.PassCreator_MissingTemplateId);
-                }
-
-                var passId = $"SPG:{cardId}";
-
-                logger.Debug(config.LSKey.Key, $"CreateWalletPass cardId:{passId}");
-
-                string passUrl = string.Empty;
-                var contact = ContactGetByCardId(cardId, 0);
-
                 //verify contact exists and get extra data
                 if (contact != null)
                 {
-                    //get existing pass
-                    var retrievePassClient = new RestClient($"https://app.passcreator.com/api/pass/{passId}");
-
-                    var retrievePassRequest = new RestRequest(string.Empty, Method.GET);
-                    retrievePassRequest.AddOrUpdateHeader("Authorization", authorizationKey);
-                    retrievePassRequest.AddOrUpdateHeader("Content-Type", "application/json");
-
-                    var retrievePassResponse = retrievePassClient.Get(retrievePassRequest);
-
-                    if (retrievePassResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrEmpty(retrievePassResponse.Content))
+                    var pass = string.Empty;
+                    try
                     {
-                        var retrievePassDynamicObject = JsonConvert.DeserializeObject<dynamic>(retrievePassResponse.Content);
-                        return retrievePassDynamicObject.linkToPassPage;
+                        //get existing pass
+                        Uri getPassUrl = new Uri($"https://app.passcreator.com/api/pass/{passId}");
+                        HttpWebRequest getPassHttpWebRequest = (HttpWebRequest) WebRequest.Create(getPassUrl);
+                        getPassHttpWebRequest.Headers.Add("Authorization", authorizationKey);
+                        getPassHttpWebRequest.ContentType = "application/json";
+                        getPassHttpWebRequest.Method = "GET";
+
+                        HttpWebResponse getPassHttpResponse = (HttpWebResponse) getPassHttpWebRequest.GetResponse();
+                        using (StreamReader streamReader = new StreamReader(getPassHttpResponse.GetResponseStream()))
+                        {
+                            pass = streamReader.ReadToEnd();
+                        }
+
+                        if (getPassHttpResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrEmpty(pass))
+                        {
+                            var retrievePassDynamicObject = JsonConvert.DeserializeObject<dynamic>(pass);
+                            return retrievePassDynamicObject.linkToPassPage;
+                        }
+
+                        /*var retrievePassClient = new RestClient($"https://app.passcreator.com/api/pass/{passId}");
+        
+                        var retrievePassRequest = new RestRequest(string.Empty, Method.GET);
+                        retrievePassRequest.AddOrUpdateHeader("Authorization", authorizationKey);
+                        retrievePassRequest.AddOrUpdateHeader("Content-Type", "application/json");
+        
+                        var retrievePassResponse = retrievePassClient.Get(retrievePassRequest);
+        
+                        if (retrievePassResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrEmpty(retrievePassResponse.Content))
+                        {
+                            var retrievePassDynamicObject = JsonConvert.DeserializeObject<dynamic>(retrievePassResponse.Content);
+                            return retrievePassDynamicObject.linkToPassPage;
+                        }*/
+                    }
+                    catch (Exception)
+                    {
+                        //pass was not found, ignore
                     }
 
                     //create pass
-                    var createPassClient = new RestClient($"https://app.passcreator.com/api/pass?passtemplate={templateId}&zapierStyle=true");
+                    Uri url = new Uri($"https://app.passcreator.com/api/pass?passtemplate={templateId}&zapierStyle=true");
+                    HttpWebRequest httpWebRequest = (HttpWebRequest) WebRequest.Create(url);
+                    httpWebRequest.Headers.Add("Authorization", authorizationKey);
+                    httpWebRequest.ContentType = "application/json";
+                    httpWebRequest.Method = "POST";
+
+                    var passCreatorBody = new PassCreatorBody()
+                    {
+                        Id = passId,
+                        Barcode = cardId,
+                        CustomerName = contact.Name,
+                        CustomerNumber = cardId
+                    };
+
+                    using (StreamWriter streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                    {
+                        streamWriter.Write(JsonConvert.SerializeObject(passCreatorBody));
+                        streamWriter.Flush();
+                        streamWriter.Close();
+                    }
+
+                    HttpWebResponse httpResponse = (HttpWebResponse) httpWebRequest.GetResponse();
+                    using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                    {
+                        pass = streamReader.ReadToEnd();
+                    }
+
+                    var retrieveCreatedPassDynamicObject = JsonConvert.DeserializeObject<dynamic>(pass);
+                    return retrieveCreatedPassDynamicObject.linkToPassPage;
+
+                    /*var createPassClient = new RestClient($"https://app.passcreator.com/api/pass?passtemplate={templateId}&zapierStyle=true");
 
                     var request = new RestRequest(Method.POST);
                     request.AddOrUpdateHeader("Authorization", authorizationKey);
@@ -2336,9 +2392,9 @@ namespace LSOmni.Service
                     var createPassResponse = createPassClient.Post(request); 
                     
                     var createPassDynamicResponse = JsonConvert.DeserializeObject<dynamic>(createPassResponse.Content);
-                    return createPassDynamicResponse.linkToPassPage;
+                    return createPassDynamicResponse.linkToPassPage;*/
                 }
-                
+
                 return passUrl;
             }
             catch (Exception ex)
