@@ -1,5 +1,5 @@
 ﻿using System;
-
+using LSOmni.Common.Util;
 using LSOmni.DataAccess.Interface.BOConnection;
 using LSRetail.Omni.Domain.DataModel.Base;
 
@@ -27,6 +27,11 @@ namespace LSOmni.BLL
         {
             logger.Debug(config.LSKey.Key, "Debug data: " + data);
             return BOCustom.MyCustomFunction(data);
+        }
+
+        public virtual bool AcceptTerms(string accountId, string deviceId, string termsAndConditionsVersion, string privacyPolicyVersion, Statistics stat)
+        {
+            return BOCustom.AcceptTerms(accountId, deviceId, termsAndConditionsVersion, privacyPolicyVersion, stat);
         }
     }
 }

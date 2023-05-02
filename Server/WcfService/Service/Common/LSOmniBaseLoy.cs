@@ -2321,20 +2321,6 @@ namespace LSOmni.Service
                             var retrievePassDynamicObject = JsonConvert.DeserializeObject<dynamic>(pass);
                             return retrievePassDynamicObject.linkToPassPage;
                         }
-
-                        /*var retrievePassClient = new RestClient($"https://app.passcreator.com/api/pass/{passId}");
-        
-                        var retrievePassRequest = new RestRequest(string.Empty, Method.GET);
-                        retrievePassRequest.AddOrUpdateHeader("Authorization", authorizationKey);
-                        retrievePassRequest.AddOrUpdateHeader("Content-Type", "application/json");
-        
-                        var retrievePassResponse = retrievePassClient.Get(retrievePassRequest);
-        
-                        if (retrievePassResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrEmpty(retrievePassResponse.Content))
-                        {
-                            var retrievePassDynamicObject = JsonConvert.DeserializeObject<dynamic>(retrievePassResponse.Content);
-                            return retrievePassDynamicObject.linkToPassPage;
-                        }*/
                     }
                     catch (Exception)
                     {
@@ -2371,28 +2357,6 @@ namespace LSOmni.Service
 
                     var retrieveCreatedPassDynamicObject = JsonConvert.DeserializeObject<dynamic>(pass);
                     return retrieveCreatedPassDynamicObject.linkToPassPage;
-
-                    /*var createPassClient = new RestClient($"https://app.passcreator.com/api/pass?passtemplate={templateId}&zapierStyle=true");
-
-                    var request = new RestRequest(Method.POST);
-                    request.AddOrUpdateHeader("Authorization", authorizationKey);
-                    request.AddOrUpdateHeader("Content-Type", "application/json");
-                    request.RequestFormat = DataFormat.Json;
-
-                    var passCreatorBody = new PassCreatorBody()
-                    {
-                        Id = passId,
-                        Barcode = cardId,
-                        CustomerName = contact.Name,
-                        CustomerNumber = cardId
-                    };
-
-                    request.AddBody(JsonConvert.SerializeObject(passCreatorBody));
-
-                    var createPassResponse = createPassClient.Post(request); 
-                    
-                    var createPassDynamicResponse = JsonConvert.DeserializeObject<dynamic>(createPassResponse.Content);
-                    return createPassDynamicResponse.linkToPassPage;*/
                 }
 
                 return passUrl;
@@ -2401,6 +2365,32 @@ namespace LSOmni.Service
             {
                 HandleExceptions(ex, $"CreateWalletPass cardId:{cardId}");
                 return null; //never gets here
+            }
+            finally
+            {
+                logger.StatisticEndMain(stat);
+            }
+        }
+
+        #endregion
+
+        #region Terms
+
+        public virtual bool AcceptTerms(string accountId, string deviceId, string termsAndConditionsVersion, string privacyPolicyVersion)
+        {
+            Statistics stat = logger.StatisticStartMain(config, serverUri);
+
+            try
+            {
+                logger.Debug(config.LSKey.Key, $"accountId:{accountId} deviceId:{deviceId} termsAndConditionsVersion:{termsAndConditionsVersion} privacyPolicyVersion:{privacyPolicyVersion}");
+
+                CustomBLL bll = new CustomBLL(config);
+                return bll.AcceptTerms(accountId, deviceId, termsAndConditionsVersion, privacyPolicyVersion, stat);
+            }
+            catch (Exception ex)
+            {
+                HandleExceptions(ex, "accountId:{0}", accountId);
+                return false; //never gets here
             }
             finally
             {

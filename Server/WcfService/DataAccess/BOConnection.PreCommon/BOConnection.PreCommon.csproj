@@ -99,6 +99,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="Web References\SaveTermsAcceptance\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
     <Compile Include="XmlMapping\BaseXml.cs" />
     <Compile Include="XmlMapping\Loyalty\AdvertisementXml.cs" />
     <Compile Include="XmlMapping\Loyalty\NavXml.cs" />
@@ -510,6 +515,11 @@
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <None Include="Web References\SaveTermsAcceptance\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\SaveTermsAcceptance\SaveTermsAcceptance.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Common\Core\Activity\Domain.DataModel.Activity\Domain.DataModel.Activity.csproj">
@@ -554,6 +564,17 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
+    <WebReferenceUrl Include="http://dhqsrvomni001:9047/LSCentral20-3-0/WS/Codeunit/SaveTermsAcceptance">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\SaveTermsAcceptance\</RelPath>
+      <UpdateFromURL>http://dhqsrvomni001:9047/LSCentral20-3-0/WS/Codeunit/SaveTermsAcceptance</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>LSOmni_DataAccess_BOConnection_PreCommon_SaveTermsAcceptance_SaveTermsAcceptance</CachedSettingsPropName>
+    </WebReferenceUrl>
     <WebReferenceUrl Include="http://dhqsrvomni001:9047/LSCentralMaster/WS/Codeunit/ODataRequest">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\LSOData\</RelPath>

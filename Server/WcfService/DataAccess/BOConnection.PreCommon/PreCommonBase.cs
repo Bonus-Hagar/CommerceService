@@ -49,6 +49,7 @@ namespace LSOmni.DataAccess.BOConnection.PreCommon
         public LSCentral.OmniWrapper centralQryWS = null;
         public LSActivity.Activity activityWS = null;
         public LSOData.ODataRequest odataWS = null;
+        public SaveTermsAcceptance.SaveTermsAcceptance SaveTermsAcceptance { get; private set; }
         private int base64ConversionMinLength = 1024 * 100; //50KB 75KB  minimum length to base64 conversion
         private static readonly object Locker = new object();
 
@@ -149,6 +150,7 @@ namespace LSOmni.DataAccess.BOConnection.PreCommon
             navWebQryReference.AllowAutoRedirect = true;
 
             centralWS = new LSCentral.OmniWrapper();
+            SaveTermsAcceptance = new SaveTermsAcceptance.SaveTermsAcceptance();
             centralQryWS = new LSCentral.OmniWrapper();
             activityWS = new LSActivity.Activity();
             odataWS = new LSOData.ODataRequest();
@@ -157,6 +159,11 @@ namespace LSOmni.DataAccess.BOConnection.PreCommon
             centralWS.Timeout = config.SettingsIntGetByKey(ConfigKey.BOTimeout) * 1000;  //millisecs,  60 seconds
             centralWS.PreAuthenticate = true;
             centralWS.AllowAutoRedirect = true;
+
+            SaveTermsAcceptance.Url = url.Replace("RetailWebServices", "SaveTermsAcceptance");
+            SaveTermsAcceptance.Timeout = config.SettingsIntGetByKey(ConfigKey.BOTimeout) * 1000;  //millisecs,  60 seconds
+            SaveTermsAcceptance.PreAuthenticate = true;
+            SaveTermsAcceptance.AllowAutoRedirect = true;
 
             centralQryWS.Url = string.IsNullOrEmpty(qryurl) ? centralWS.Url : qryurl.Replace("RetailWebServices", "OmniWrapper");
             centralQryWS.Timeout = config.SettingsIntGetByKey(ConfigKey.BOTimeout) * 1000;  //millisecs,  60 seconds
@@ -180,6 +187,7 @@ namespace LSOmni.DataAccess.BOConnection.PreCommon
                 navWebQryReference.GetType().GetProperty("AuthToken").SetValue(navWebQryReference, token);
 
                 centralWS.GetType().GetProperty("AuthToken").SetValue(centralWS, token);
+                SaveTermsAcceptance.GetType().GetProperty("AuthToken").SetValue(centralWS, token);
                 centralQryWS.GetType().GetProperty("AuthToken").SetValue(centralQryWS, token);
                 activityWS.GetType().GetProperty("AuthToken").SetValue(activityWS, token);
                 odataWS.GetType().GetProperty("AuthToken").SetValue(odataWS, token);
@@ -193,6 +201,7 @@ namespace LSOmni.DataAccess.BOConnection.PreCommon
                     navWebQryReference.Credentials = credentials;
 
                     centralWS.Credentials = credentials;
+                    SaveTermsAcceptance.Credentials = credentials;
                     centralQryWS.Credentials = credentials;
                     activityWS.Credentials = credentials;
                     odataWS.Credentials = credentials;
@@ -205,6 +214,7 @@ namespace LSOmni.DataAccess.BOConnection.PreCommon
                 navWebQryReference.Proxy = GetWebProxy();
 
                 centralWS.Proxy = GetWebProxy();
+                SaveTermsAcceptance.Proxy = GetWebProxy();
                 centralQryWS.Proxy = GetWebProxy();
                 activityWS.Proxy = GetWebProxy();
                 odataWS.Proxy = GetWebProxy();

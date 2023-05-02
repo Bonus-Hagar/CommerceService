@@ -3629,6 +3629,22 @@ namespace LSOmni.Service
 
         #endregion
 
+        #region Terms
+
+        /// <summary>
+        /// Save that user has accepted terms and privacy policy
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="deviceId"></param>
+        /// <param name="termsAndConditionsVersion"></param>
+        /// <param name="privacyPolicyVersion"></param>
+        /// <returns></returns>
+        [OperationContract]
+        [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped, ResponseFormat = WebMessageFormat.Json)]
+        bool AcceptTerms(string accountId, string deviceId, string termsAndConditionsVersion, string privacyPolicyVersion);
+
+        #endregion  
+
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped, ResponseFormat = WebMessageFormat.Json)]
         string MyCustomFunction(string data);

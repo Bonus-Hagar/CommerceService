@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configurationSnapshot xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:schemas-microsoft-com:xml-wcfconfigurationsnapshot">
+  <behaviors />
+  <bindings>
+    <binding digest="System.ServiceModel.Configuration.BasicHttpBindingElement, System.ServiceModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089:&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data name=&quot;SaveTermsAcceptance_Binding&quot; /&gt;" bindingType="basicHttpBinding" name="SaveTermsAcceptance_Binding" />
+  </bindings>
+  <endpoints>
+    <endpoint normalizedDigest="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data address=&quot;http://dhqsrvomni001:9047/LSCentral20-3-0/WS/CRONUS%20-%20LS%20Central/Codeunit/SaveTermsAcceptance&quot; binding=&quot;basicHttpBinding&quot; bindingConfiguration=&quot;SaveTermsAcceptance_Binding&quot; contract=&quot;SaveTermsAcceptance.SaveTermsAcceptance_Port&quot; name=&quot;SaveTermsAcceptance_Port&quot; /&gt;" digest="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data address=&quot;http://dhqsrvomni001:9047/LSCentral20-3-0/WS/CRONUS%20-%20LS%20Central/Codeunit/SaveTermsAcceptance&quot; binding=&quot;basicHttpBinding&quot; bindingConfiguration=&quot;SaveTermsAcceptance_Binding&quot; contract=&quot;SaveTermsAcceptance.SaveTermsAcceptance_Port&quot; name=&quot;SaveTermsAcceptance_Port&quot; /&gt;" contractName="SaveTermsAcceptance.SaveTermsAcceptance_Port" name="SaveTermsAcceptance_Port" />
+  </endpoints>
+</configurationSnapshot>
