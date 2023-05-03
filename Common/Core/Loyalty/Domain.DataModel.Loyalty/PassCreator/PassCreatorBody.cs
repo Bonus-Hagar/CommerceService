@@ -12,9 +12,11 @@ namespace LSRetail.Omni.Domain.DataModel.Loyalty.PassCreator
         //[JsonProperty("barcodeValue")]
         [JsonIgnore]
         public string Barcode { get; set; }
-        [JsonProperty("5b361ad1b82342.33286937")]
+        [JsonProperty("card_holder_name")]
+        //[JsonProperty("5b361ad1b82342.33286937")]
         public string CustomerName { get; set; }
-        [JsonProperty("5b361ad1b82592.54970699")]
+        [JsonProperty("card_number")]
+        //[JsonProperty("5b361ad1b82592.54970699")]
         public string CustomerNumber { get; set; }
     }
 }

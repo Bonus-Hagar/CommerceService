@@ -3222,7 +3222,7 @@ namespace LSOmni.Service
         /// <param name="cardId"></param>
         /// <returns></returns>
         [OperationContract]
-        string CreateWalletPass(string cardId);
+        string CreateWalletPass(string cardId, PlatformType platformType);
 
         #endregion
 

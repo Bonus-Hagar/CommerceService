@@ -2267,7 +2267,7 @@ namespace LSOmni.Service
 
         #region PassCreator
 
-        public virtual string CreateWalletPass(string cardId)
+        public virtual string CreateWalletPass(string cardId, PlatformType platformType)
         {
             Statistics stat = logger.StatisticStartMain(config, serverUri);
 
@@ -2319,7 +2319,8 @@ namespace LSOmni.Service
                         if (getPassHttpResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrEmpty(pass))
                         {
                             var retrievePassDynamicObject = JsonConvert.DeserializeObject<dynamic>(pass);
-                            return retrievePassDynamicObject.linkToPassPage;
+                            return PassCreatorGetDeviceUrl(passId, platformType);
+                            //return retrievePassDynamicObject.linkToPassPage;
                         }
                     }
                     catch (Exception)
@@ -2356,7 +2357,8 @@ namespace LSOmni.Service
                     }
 
                     var retrieveCreatedPassDynamicObject = JsonConvert.DeserializeObject<dynamic>(pass);
-                    return retrieveCreatedPassDynamicObject.linkToPassPage;
+                    return PassCreatorGetDeviceUrl(passId, platformType);
+                    //return retrieveCreatedPassDynamicObject.linkToPassPage;
                 }
 
                 return passUrl;
@@ -2370,6 +2372,38 @@ namespace LSOmni.Service
             {
                 logger.StatisticEndMain(stat);
             }
+        }
+
+        private string PassCreatorGetDeviceUrl(string id, PlatformType platformType)
+        {
+            string authorizationKey = config.SettingsGetByKey(ConfigKey.PassCreator_AuthorizationKey);
+            string jsonResponse = string.Empty;
+
+            //get links
+            Uri url = new Uri($"https://app.passcreator.com/api/pass/geturis/{id}");
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+            httpWebRequest.Headers.Add("Authorization", authorizationKey);
+            httpWebRequest.ContentType = "application/json";
+            httpWebRequest.Method = "GET";
+
+            HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                jsonResponse = streamReader.ReadToEnd();
+            }
+
+            var retrieveLinksDynamicObject = JsonConvert.DeserializeObject<dynamic>(jsonResponse);
+
+            if (platformType == PlatformType.Android)
+            {
+                return retrieveLinksDynamicObject.AndroidUri;
+            }
+            else if (platformType == PlatformType.iOS)
+            {
+                return retrieveLinksDynamicObject.iPhoneUri;
+            }
+
+            return string.Empty;
         }
 
         #endregion

@@ -3625,7 +3625,7 @@ namespace LSOmni.Service
         /// <returns></returns>
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped, ResponseFormat = WebMessageFormat.Json)]
-        string CreateWalletPass(string cardId);
+        string CreateWalletPass(string cardId, PlatformType platformType);
 
         #endregion
 
